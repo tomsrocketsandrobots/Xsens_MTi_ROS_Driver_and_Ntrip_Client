@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
     // Declare the XdaInterface with the node
     auto xdaInterface = std::make_shared<XdaInterface>(node);
-    RCLCPP_INFO(node->get_logger(), "XdaInterface has been initialized");
+    RCLCPP_INFO(node->get_logger(), "XdaInterface has been initialized!!!1");
 
     if (!xdaInterface->connectDevice()) {
         RCLCPP_ERROR(node->get_logger(), "Failed to connect device");
