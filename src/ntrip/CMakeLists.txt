@@ -20,14 +20,20 @@ add_library(${PROJECT_NAME}_lib
   src/ntrip_client.cpp
   src/rtcm_parser.cpp
 )
-
-ament_target_dependencies(${PROJECT_NAME}_lib
-  rclcpp
-  nmea_msgs
-  mavros_msgs
-  diagnostic_msgs
-  std_msgs
+target_link_libraries(${PROJECT_NAME}_lib
+  ${diagnostic_msgs_TARGETS}
+  ${mavros_msgs_TARGETS}
+  ${nmea_msgs_TARGETS}
+  ${std_msgs_TARGETS}
+  rclcpp::rclcpp
 )
+# ament_target_dependencies(${PROJECT_NAME}_lib
+#   rclcpp
+#   nmea_msgs
+#   mavros_msgs
+#   diagnostic_msgs
+#   std_msgs
+# )
 
 target_link_libraries(${PROJECT_NAME}_lib
   Boost::system
@@ -40,9 +46,14 @@ target_link_libraries(ntrip
   ${PROJECT_NAME}_lib
 )
 
-ament_target_dependencies(ntrip
-  rclcpp
-)
+# ament_target_dependencies(ntrip
+#   rclcpp
+# )
+
+target_link_libraries(ntrip
+    rclcpp::rclcpp
+  )
+
 
 install(TARGETS
   ${PROJECT_NAME}_lib
