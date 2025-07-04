@@ -21,7 +21,15 @@ find_package(nmea_msgs REQUIRED)
 find_package(mavros_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
-link_directories(lib/xspublic/xscontroller lib/xspublic/xscommon lib/xspublic/xstypes)
+# link_directories(
+#   lib/xspublic/xscontroller
+#    lib/xspublic/xscommon
+#     lib/xspublic/xstypes)
+link_directories(
+  ${CMAKE_SOURCE_DIR}/lib/xspublic/xscontroller
+  ${CMAKE_SOURCE_DIR}/lib/xspublic/xscommon
+  ${CMAKE_SOURCE_DIR}/lib/xspublic/xstypes
+)
 
 # Check ROS distro
 if(DEFINED ENV{ROS_DISTRO})
@@ -66,6 +74,19 @@ ExternalProject_Add(
   INSTALL_COMMAND "" # No install step
 )
 
+add_custom_target(
+  xspublic_build ALL
+  COMMAND ${CMAKE_MAKE_PROGRAM}
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib/xspublic
+)
+# ExternalProject_Add(xspublic
+#   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/xspublic
+#   CONFIGURE_COMMAND ""  # No ./configure step
+#   BUILD_COMMAND make
+#   BUILD_IN_SOURCE 1
+#   INSTALL_COMMAND ""    # No install step
+# )
+
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
@@ -89,10 +110,10 @@ add_executable(
 add_dependencies(xsens_mti_node xspublic ${PROJECT_NAME})
 
 
-# target_include_directories(xsens_mti_node PUBLIC
-#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib/xspublic>
-#   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_cpp> 
-#   $<INSTALL_INTERFACE:include>)
+target_include_directories(xsens_mti_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib/xspublic>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_cpp>
+  $<INSTALL_INTERFACE:include>)
 
 # ament_target_dependencies(xsens_mti_node 
 # 	rclcpp
@@ -106,7 +127,7 @@ add_dependencies(xsens_mti_node xspublic ${PROJECT_NAME})
 # 	mavros_msgs
 # 	rosidl_default_runtime
 # )
-target_link_libraries(xsens_mti_node
+target_link_libraries(xsens_mti_node PUBLIC
   ${geometry_msgs_TARGETS}
   ${mavros_msgs_TARGETS}
   ${nav_msgs_TARGETS}
@@ -123,7 +144,7 @@ target_link_libraries(xsens_mti_node
 # Handle typesupport linking differently based on ROS distro
 if(${ROS_DISTRO} STREQUAL "foxy")
   # For Foxy, directly link to the generated libraries
-  target_link_libraries(xsens_mti_node
+  target_link_libraries(xsens_mti_node PUBLIC
     ${CMAKE_BINARY_DIR}/libxsens_mti_ros2_driver__rosidl_typesupport_cpp.so
   )
 
@@ -139,14 +160,13 @@ if(${ROS_DISTRO} STREQUAL "foxy")
 else()
   # For Humble and later, use the built-in typesupport target function
   rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_typesupport_cpp")
-  target_link_libraries(xsens_mti_node "${cpp_typesupport_target}")
+  target_link_libraries(xsens_mti_node PUBLIC "${cpp_typesupport_target}")
 endif()
 
-target_link_libraries(
-  xsens_mti_node
-  xscontroller
-  xscommon
-  xstypes
+target_link_libraries(xsens_mti_node PUBLIC
+  ${CMAKE_SOURCE_DIR}/lib/xspublic/xscontroller/libxscontroller.so
+  ${CMAKE_SOURCE_DIR}/lib/xspublic/xscommon/libxscommon.so
+  ${CMAKE_SOURCE_DIR}/lib/xspublic/xstypes/libxstypes.so
   pthread
   dl
 )

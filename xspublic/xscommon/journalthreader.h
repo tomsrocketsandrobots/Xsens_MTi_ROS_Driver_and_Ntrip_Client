@@ -33,7 +33,9 @@
 #ifndef JOURNALTHREADER_H
 #define JOURNALTHREADER_H
 
-#include "xscommon_config.h"
+// #include "xscommon_config.h"
+#include <xstypes/xstypesconfig.h>
+
 #include <string>
 #include "journalloglevel.h"
 #if JOURNALLER_WITH_THREAD_SUPPORT
